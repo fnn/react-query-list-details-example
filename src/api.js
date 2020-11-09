@@ -1,3 +1,5 @@
+import { queryClient } from "./App";
+
 const db = [
   { id: 1, name: "Do stuff", details: "This is TODO 1", done: false },
   { id: 2, name: "TODO 2", details: "This is TODO 2", done: false },
@@ -11,7 +13,11 @@ export const fetchTodos = () => {
     setTimeout(() => {
       resolve(JSON.stringify(db));
     }, 1000);
-  }).then((res) => JSON.parse(res));
+  }).then((res) => {
+    const todos = JSON.parse(res);
+    todos.forEach((todo) => queryClient.setQueryData(["todo", todo.id], todo));
+    return todos;
+  });
 };
 
 export const fetchTodo = (id) => {

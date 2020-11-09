@@ -9,9 +9,28 @@ import {
 import { fetchTodos, fetchTodo, toggleTodo } from "./api";
 import "./styles.css";
 
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false } }
 });
+
+function ListItem({ todoId, onSelect }) {
+  const { data, isLoading } = useQuery(
+    ["todo", todoId],
+    () => fetchTodo(todoId),
+    { staleTime: Infinity }
+  );
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div>
+      {data.done ? "✅" : "❌"}
+      <button onClick={() => onSelect(data.id)}>{data.name}</button>
+    </div>
+  );
+}
 
 function List({ onSelect }) {
   const { data, isLoading } = useQuery(["todos"], () => fetchTodos());
@@ -22,10 +41,9 @@ function List({ onSelect }) {
 
   return (
     <ul>
-      {data.map((todo) => (
-        <li key={todo.id}>
-          {todo.done ? "✅" : "❌"}
-          <button onClick={() => onSelect(todo.id)}>{todo.name}</button>
+      {data.map(({ id }) => (
+        <li key={id}>
+          <ListItem todoId={id} onSelect={onSelect} />
         </li>
       ))}
     </ul>
