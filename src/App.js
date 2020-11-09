@@ -3,12 +3,15 @@ import {
   QueryClient,
   QueryClientProvider,
   useMutation,
-  useQuery
+  useQuery,
+  useQueryClient
 } from "react-query";
 import { fetchTodos, fetchTodo, toggleTodo } from "./api";
 import "./styles.css";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { refetchOnWindowFocus: false } }
+});
 
 function List({ onSelect }) {
   const { data, isLoading } = useQuery(["todos"], () => fetchTodos());
@@ -30,6 +33,7 @@ function List({ onSelect }) {
 }
 
 function Details({ selected }) {
+  const queryClient = useQueryClient();
   const { data, isLoading } = useQuery(
     ["todo", selected],
     () => fetchTodo(selected),
@@ -55,7 +59,15 @@ function Details({ selected }) {
         {data?.name}
       </h1>
       <p>{data?.details}</p>
-      <button onClick={() => mutate(selected)}>Toggle</button>
+      <button
+        onClick={() =>
+          mutate(selected, {
+            onSettled: () => queryClient.invalidateQueries(["todo", selected])
+          })
+        }
+      >
+        Toggle
+      </button>
     </div>
   );
 }

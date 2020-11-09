@@ -6,25 +6,28 @@ const db = [
 ];
 
 export const fetchTodos = () => {
+  console.log("fetch Todos");
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(db);
-    }, 2000);
-  });
+      resolve(JSON.stringify(db));
+    }, 1000);
+  }).then((res) => JSON.parse(res));
 };
 
 export const fetchTodo = (id) => {
+  console.log("fetch Todo: ", id);
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(db.find((todo) => todo.id === id));
-    }, 1000);
-  });
+      resolve(JSON.stringify(db.find((todo) => todo.id === id)));
+    }, 250);
+  }).then((res) => JSON.parse(res));
 };
 
 export const toggleTodo = (id) => {
+  console.log("toggle Todo: ", id);
   return new Promise((resolve) => {
     const todo = db.find((todo) => todo.id === id);
     todo.done = !todo.done;
-    resolve(todo);
-  });
+    resolve(JSON.stringify(todo));
+  }).then((res) => JSON.parse(res));
 };
